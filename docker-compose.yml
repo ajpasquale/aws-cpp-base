@@ -1,0 +1,44 @@
+version: '3'
+services:
+  remote_host:
+    container_name: aws-cpp-app
+    image: aws-cpp-app:latest
+    tty: true
+    networks:
+      - net
+  remote_host2:
+    container_name: aws-cpp-app2
+    image: aws-cpp-app:test
+    tty: true
+    networks:
+      - net
+  db_host2:
+    container_name: db2
+    image: mariadb:5.5.64-trusty
+    environment:
+      - "MYSQL_ROOT_PASSWORD=1234"
+    volumes:
+      - blah:/home/node/app
+    networks:
+      - net
+  ftpd_server:
+    image: stilliard/pure-ftpd
+    container_name: pure-ftpd
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    environment:
+      PUBLICHOST: "localhost"
+      FTP_USER_NAME: aws-cpp
+      FTP_USER_PASS: 1234
+      FTP_USER_HOME: /home/aws-app
+    restart: always
+    volumes:
+      - "$PWD/data:/home/username/"
+      - "$PWD/passwd:/etc/pure-ftpd/passwd"
+      - blah:/home/node/app
+volumes:
+  blah:
+    external: true
+networks:
+  net:
